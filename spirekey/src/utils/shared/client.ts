@@ -9,7 +9,7 @@ export const getChainwebUrl = ({
   host?: string;
 }) => {
   if (networkId === 'mainnet01')
-    return `https://api.chainweb.com/chainweb/0.0/${networkId}/chain/${chainId}/pact`;
+    return `https://chainweb.eckowallet.com/chainweb/0.0/${networkId}/chain/${chainId}/pact`;
   if (networkId === 'testnet04')
     return `https://api.testnet.chainweb.com/chainweb/0.0/${networkId}/chain/${chainId}/pact`;
   if (networkId === 'l1')

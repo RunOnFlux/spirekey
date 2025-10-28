@@ -1,7 +1,7 @@
 export const getChainwebDataUrl = (network: string) => {
   switch (network) {
     case 'mainnet01':
-      return 'https://estats.chainweb.com';
+      return 'https://chainweb.eckowallet.com';
     case 'testnet04':
       return 'https://estats.testnet.chainweb.com';
     default:
