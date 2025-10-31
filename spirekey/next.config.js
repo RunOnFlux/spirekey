@@ -26,6 +26,8 @@ const nextConfig = {
     USE_RACCOUNT: process.env.USE_RACCOUNT,
     GA_ACCOUNT: process.env.GA_ACCOUNT,
     GA_ACCOUNT_API: process.env.GA_ACCOUNT_API,
+    GRAPHQL_API_KEY: process.env.GRAPHQL_API_KEY,
+    NEXT_PUBLIC_GRAPHQL_API_KEY: process.env.NEXT_PUBLIC_GRAPHQL_API_KEY,
   },
   async redirects() {
     return [

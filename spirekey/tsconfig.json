@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": [".kadena/pactjs-generated", "vitest/globals"],
+    "types": [".kadena/pactjs-generated", "vitest/globals", "node"],
     "target": "esnext",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
