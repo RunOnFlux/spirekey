@@ -15,7 +15,7 @@ const getGraphqlHost = (networkId: string) => {
   if (networkId === 'development') return 'http://localhost:8080/graphql';
   if (networkId === 'testnet04')
     return 'https://graph.testnet.kadena.network/graphql';
-  return 'https://api.mainnet.kadindexer.io/v1';
+  return 'https://indexer.kda-1.zelcore.io/graphql';
 };
 const cache = new InMemoryCache();
 const httpLink = new HttpLink({
