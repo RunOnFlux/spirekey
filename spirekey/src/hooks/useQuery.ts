@@ -12,10 +12,18 @@ import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client';
 
 declare const process: { env: Record<string, string | undefined> };
 const getGraphqlHost = (networkId: string) => {
-  if (networkId === 'development') return 'http://localhost:8080/graphql';
+  if (networkId === 'development')
+    return (
+      process.env.GRAPHQL_URL_DEVELOPMENT ?? 'http://localhost:8080/graphql'
+    );
   if (networkId === 'testnet04')
-    return 'https://graph.testnet.kadena.network/graphql';
-  return 'https://indexer.kda-1.zelcore.io/graphql';
+    return (
+      process.env.GRAPHQL_URL_TESTNET ??
+      'https://graph.testnet.kadena.network/graphql'
+    );
+  return (
+    process.env.GRAPHQL_URL_MAINNET ?? 'https://indexer.kda-2.zelcore.io/graphql'
+  );
 };
 const cache = new InMemoryCache();
 const httpLink = new HttpLink({
