@@ -42,6 +42,13 @@ export const createAccount = async (
     deviceType,
     credentialId,
   } = await getNewWebauthnKey(alias);
+  console.log('[SpireKey][CreateAccount] WebAuthn key', {
+    passKey,
+    deviceType,
+    credentialId,
+    alias,
+    networkId,
+  });
   const account = {
     networkId,
     credentialId,
@@ -70,7 +77,17 @@ export const createAccount = async (
     publicKey,
     secretKey,
   });
-  return {
+  console.log('[SpireKey][CreateAccount] Account resolved', {
+    accountName,
+    alias,
+    networkId,
+    guard,
+  });
+  console.log('[SpireKey][CreateAccount] Pending transactions', {
+    count: pendingTxs.length,
+    firstTx: pendingTxs[0],
+  });
+  const resultAccount = {
     accountName,
     guard,
     networkId,
@@ -95,6 +112,12 @@ export const createAccount = async (
     ],
     txQueue: pendingTxs,
   };
+  console.log('[SpireKey][CreateAccount] Account result', {
+    accountName: resultAccount.accountName,
+    alias: resultAccount.alias,
+    deviceCount: resultAccount.devices.length,
+  });
+  return resultAccount;
 };
 const createAccountMutation = gql`
   mutation CreateAccount(
@@ -187,6 +210,12 @@ const registerAccountOnChain = async ({
   publicKey: string;
   secretKey: string;
 }): Promise<ITransactionDescriptor> => {
+  console.log('[SpireKey][CreateAccount] Register chain tx', {
+    chainId,
+    credentialId,
+    networkId,
+    deviceType,
+  });
   const tx = createTransactionBuilder()
     .execution(
       `
@@ -256,5 +285,9 @@ const registerAccountOnChain = async ({
       sign(unsignedTx.cmd, keyPair) as { sig: string },
     );
   }, tx) as ICommand;
+  console.log('[SpireKey][CreateAccount] Submitted chain tx', {
+    chainId,
+    requestKey: signedTx.hash,
+  });
   return await l1Client.submit(signedTx);
 };

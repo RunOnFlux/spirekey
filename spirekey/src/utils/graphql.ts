@@ -10,6 +10,13 @@ export const getGraphClient = async (
   query: string,
   variables: any,
 ) => {
+  console.log('[SpireKey][GraphQL] Request', {
+    networkId,
+    endpoint: getGraphqlHost(networkId),
+    hasApiKey: Boolean(process.env.NEXT_PUBLIC_GRAPHQL_API_KEY ?? process.env.GRAPHQL_API_KEY),
+    opName: /\b(query|mutation)\s+(\w+)/.exec(query)?.[2],
+    variables,
+  });
   const apiKey =
     process.env.NEXT_PUBLIC_GRAPHQL_API_KEY ?? process.env.GRAPHQL_API_KEY;
   const baseHeaders: Record<string, string> = {
@@ -32,6 +39,9 @@ export const getGraphClient = async (
   });
 
   const { data } = await res.json();
+  console.log('[SpireKey][GraphQL] Response', {
+    ok: Boolean(data),
+  });
   if (!data)
     throw new Error(
       `Could not query: ${query} with: ${JSON.stringify(variables)}`,

@@ -75,7 +75,9 @@ const getAaguid = (authData?: string) => {
 
 export const getNewWebauthnKey = async (displayName: string) => {
   const res = await startRegistration({
-    challenge: bufferToBase64URLString(Buffer.from('some-random-string')),
+    challenge: bufferToBase64URLString(
+      new TextEncoder().encode('some-random-string').buffer,
+    ),
     rp: {
       name: 'Kadena Spirekey',
       id: getHostname(),

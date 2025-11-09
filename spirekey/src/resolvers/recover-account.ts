@@ -37,6 +37,10 @@ export const recoverAccount = async (
     challenge: 'recoverchallenge',
     rpId: getHostname(),
   });
+  console.log('[SpireKey][RecoverAccount] Authentication credential', {
+    credentialId: id,
+    networkId,
+  });
   const { data } = await client.query({
     query: getAccountsByCidQuery,
     variables: {
@@ -48,6 +52,7 @@ export const recoverAccount = async (
   if (!info) throw new Error('No account found');
   const params: string[] = JSON.parse(info);
   const account = params.find((x) => x.startsWith('r:'));
+  console.log('[SpireKey][RecoverAccount] Account identifier', { account });
   return account;
 };
 
@@ -74,6 +79,11 @@ export const useRecoverAccount = () => {
       ...account,
       alias: `SpireKey Account ${accounts.length + 1}`,
     };
+    console.log('[SpireKey][RecoverAccount] Restored account data', {
+      accountName: recoveredAccount.accountName,
+      alias: recoveredAccount.alias,
+      networkId,
+    });
     setAccount(recoveredAccount);
     return recoveredAccount;
   };

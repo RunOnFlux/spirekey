@@ -7,5 +7,8 @@ export const getNetworkDisplayName = (network: string) => {
 
 export const getRootkeyPasskeyName = (network: string) => {
   const rootkeyPasskeyName = `SpireKey Wallet Manager`;
-  return `${rootkeyPasskeyName} (${getNetworkDisplayName(network)})`;
+  const now = new Date();
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const ts = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+  return `${rootkeyPasskeyName} (${getNetworkDisplayName(network)}) ${ts}`;
 };

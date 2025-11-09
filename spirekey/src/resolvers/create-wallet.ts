@@ -53,7 +53,7 @@ export const createWallet = async (
     getRootkeyPasskeyName(networkId!),
   );
 
-  const tempPassword = crypto.getRandomValues(new Uint16Array(32));
+  const tempPassword = crypto.getRandomValues(new Uint8Array(32));
   const entropy = await crypto.subtle.digest('sha-256', Buffer.from(hex));
   const mnemonic = bip39.entropyToMnemonic(new Uint8Array(entropy), wordlist);
   const seed = await kadenaMnemonicToSeed(tempPassword, mnemonic);

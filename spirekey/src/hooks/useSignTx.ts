@@ -39,6 +39,7 @@ export const useSignTx = () => {
     initSpireKey({
       hostUrl: window.location.origin,
     });
+    console.log('[SpireKey][Sign] init', { hostUrl: window.location.origin });
   }, []);
   return { signTx };
 };
@@ -63,6 +64,12 @@ const signTx = async ({
   proof: string;
   capabilities: string;
 }) => {
+  console.log('[SpireKey][Sign] build tx', {
+    hasData: Boolean(data),
+    networkId,
+    accountName,
+    signer: accountName === 'sender00' ? 'genesis' : 'webauthn',
+  });
   const addData = addDataString(data);
   const builder = createTransactionBuilder().execution(code);
   const tx = addData(builder)
@@ -94,5 +101,6 @@ const signTx = async ({
   const {
     transactions: [signedTx],
   } = await sign([tx]);
+  console.log('[SpireKey][Sign] signed', { hash: signedTx.hash });
   return signedTx;
 };

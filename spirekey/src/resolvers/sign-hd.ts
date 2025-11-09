@@ -25,6 +25,7 @@ export const signSubmitHd = async (
   { client }: ApolloContextValue,
 ) => {
   if (!client) throw new Error('No client available');
+  console.log('[SpireKey][SignHD] Start', { networkId, txCount: txs.length });
   const { data, error } = await client.query({
     query: connectWalletQuery,
     variables: { networkId },
@@ -32,11 +33,14 @@ export const signSubmitHd = async (
   if (error) throw error;
   if (!data?.connectWallet) throw new Error('No wallet connected');
   const { publicKey, secretKey } = data.connectWallet;
+  console.log('[SpireKey][SignHD] Wallet', { publicKey });
   const signWithHd = signWithKeyPair({ publicKey, secretKey });
   const signedTxs = txs.map(signWithHd);
+  console.log('[SpireKey][SignHD] Signed txs', { count: signedTxs.length });
   const results = await Promise.all(signedTxs.map((tx) => l1Client.local(tx)));
   if (results.some((r) => r.result.status !== 'success'))
     throw new Error('Could not sign transactions');
+  console.log('[SpireKey][SignHD] Submitting txs');
   return await Promise.all(
     signedTxs.map((tx) => l1Client.submit(tx as ICommand)),
   );
@@ -54,6 +58,7 @@ export const useSignSubmitHd = () => {
     return await signSubmitTxs(networkId, txs);
   };
   const signSubmitTxs = async (networkId: string, txs: IUnsignedCommand[]) => {
+    console.log('[SpireKey][SignHD] Mutate signSubmitHd', { networkId, txCount: txs.length });
     const { data, errors } = await mutate({
       variables: {
         networkId,

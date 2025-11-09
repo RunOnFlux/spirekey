@@ -55,7 +55,9 @@ export const useRegistration = ({ chainId, networkId }: UseRegistration) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
+      console.log('[SpireKey][Registration] Connect wallet - requesting credentials', { networkId });
       const recoveredKey = await getCredentials(networkId);
+      console.log('[SpireKey][Registration] Connect wallet - credentials', { hasMnemonic: Boolean(recoveredKey.mnemonic), publicKey: recoveredKey.publicKey });
       if (!recoveredKey.mnemonic)
         return addNotification({
           variant: 'warning',
@@ -79,7 +81,9 @@ export const useRegistration = ({ chainId, networkId }: UseRegistration) => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
+      console.log('[SpireKey][Registration] Register wallet - start', { networkId, chainId });
       const keypair = await createWallet(networkId, chainId!);
+      console.log('[SpireKey][Registration] Register wallet - created', { publicKey: keypair.publicKey });
       setKeypair(keypair);
     } catch (_) {
     } finally {
@@ -92,6 +96,7 @@ export const useRegistration = ({ chainId, networkId }: UseRegistration) => {
     setIsSubmitting(true);
     if (!keypair) throw new Error('No wallet available');
     try {
+      console.log('[SpireKey][Registration] Create account - start', { networkId, alias, color });
       // get domain name and place the protocol in front of it
       const account = await createAccount({
         domain: `${window.location.protocol}//${getHostname()}`,
@@ -101,6 +106,7 @@ export const useRegistration = ({ chainId, networkId }: UseRegistration) => {
         publicKey: keypair.publicKey,
         secretKey: keypair.secretKey,
       });
+      console.log('[SpireKey][Registration] Create account - success', { accountName: account.accountName });
       setSuccesfulAuthentication(true);
       setAccount(account);
       setCurrentAccount(account);
@@ -123,7 +129,9 @@ export const useRegistration = ({ chainId, networkId }: UseRegistration) => {
     setIsSubmitting(true);
 
     try {
+      console.log('[SpireKey][Registration] Recover account - start', { networkId });
       const account = await recoverAccount(networkId);
+      console.log('[SpireKey][Registration] Recover account - success', { accountName: account });
       return account;
     } catch (error: any) {
       addNotification({
