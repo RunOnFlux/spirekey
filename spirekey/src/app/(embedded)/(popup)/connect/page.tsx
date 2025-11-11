@@ -1,47 +1,14 @@
 'use client';
 
-import SpireKeyLogoAnimated from '@/assets/images/chainweaver-logo-light-animated.svg';
-import Connect from '@/components/Embedded/Connect';
-import { type ChainId } from '@kadena/client';
-import { Stack } from '@kadena/kode-ui';
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-export default function SidebarSign() {
-  const [networkId, setNetworkId] = useState<string | null>(null);
-  const [chainId, setChainId] = useState<ChainId | null>(null);
-
+export default function LegacyEmbeddedConnectRedirect() {
   useEffect(() => {
-    const getHash = () => {
-      const params = new URLSearchParams(
-        window.location.hash.replace(/^#/, '?'),
-      );
-      setNetworkId(params.get('networkId'));
-      setChainId(params.get('chainId') as ChainId);
-    };
-
-    const onHashChanged = () => {
-      getHash();
-    };
-
-    getHash();
-    window.addEventListener('hashchange', onHashChanged);
-
-    return () => {
-      window.removeEventListener('hashchange', onHashChanged);
-    };
+    try {
+      const hash = typeof window !== 'undefined' ? window.location.hash : '';
+      const target = `/connect${hash || ''}`;
+      window.location.replace(target);
+    } catch {}
   }, []);
-
-  if (networkId && chainId)
-    return <Connect networkId={networkId} chainId={chainId} />;
-  return (
-    <Stack alignItems="center" justifyContent="center" height="100%">
-      <Image
-        src={SpireKeyLogoAnimated}
-        alt="Connecting account.."
-        height={128}
-        width={128}
-      />
-    </Stack>
-  );
+  return null;
 }
