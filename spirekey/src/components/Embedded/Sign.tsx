@@ -9,6 +9,7 @@ import { getAccountsForTx, getPermissions } from '@/utils/consent';
 import { getSignature } from '@/utils/getSignature';
 import { publishEvent } from '@/utils/publishEvent';
 import { l1Client } from '@/utils/shared/client';
+import { addSignatures } from '@kadena/client';
 import { Button, Stack } from '@kadena/kode-ui';
 import { CardFixedContainer, CardFooterGroup } from '@kadena/kode-ui/patterns';
 import type { OptimalTransactionsAccount } from '@kadena/spirekey-types';
@@ -22,10 +23,17 @@ import { getPubkey, getSubtitle } from './utils';
 interface IProps {
   transactions?: string;
   accounts?: string;
+  onSign?: (signedTransactions: ICommand[]) => void;
+  onCancel?: () => void;
 }
 
 const Sign: FC<IProps> = (props) => {
-  const { transactions, accounts: signAccountsString } = props;
+  const {
+    transactions,
+    accounts: signAccountsString,
+    onSign: onSignCallback,
+    onCancel: onCancelCallback,
+  } = props;
   const { accounts, loading } = useAccounts();
   const { setAccount } = useAccount();
   const { errorMessage, setErrorMessage } = useErrors();
@@ -81,6 +89,7 @@ const Sign: FC<IProps> = (props) => {
   }, []);
 
   useEffect(() => {
+    if (onCancelCallback) return;
     const cancel = (e: any) => {
       if (window.location.origin !== e.target.origin)
         publishEvent('canceled:sign');
@@ -91,7 +100,7 @@ const Sign: FC<IProps> = (props) => {
     return () => {
       window.removeEventListener('beforeunload', cancel);
     };
-  }, []);
+  }, [onCancelCallback]);
   const onSign = async () => {
     const device = txAccounts.accounts[0].devices[0];
     const credentialId = device['credential-id'];
@@ -104,7 +113,6 @@ const Sign: FC<IProps> = (props) => {
     });
 
     if (!signedPlumbingTxs) {
-      //TODO should be in try catch Error handling
       const txMap = {
         [tx.hash]: [
           {
@@ -113,6 +121,13 @@ const Sign: FC<IProps> = (props) => {
           },
         ],
       };
+
+      if (onSignCallback) {
+        const signature = txMap[tx.hash][0];
+        const signedTx = addSignatures(tx, signature) as ICommand;
+        return onSignCallback([signedTx]);
+      }
+
       return publishEvent('signed', {
         accounts: signAccounts
           .map((a) =>
@@ -143,7 +158,6 @@ const Sign: FC<IProps> = (props) => {
       return newAccount;
     });
 
-    //TODO should be in try catch Error handling
     const txMap = {
       [tx.hash]: [
         {
@@ -152,6 +166,13 @@ const Sign: FC<IProps> = (props) => {
         },
       ],
     };
+
+    if (onSignCallback) {
+      const signature = txMap[tx.hash][0];
+      const signedTx = addSignatures(tx, signature) as ICommand;
+      return onSignCallback([signedTx]);
+    }
+
     publishEvent('signed', {
       accounts: accs,
       tx: txMap,
@@ -159,7 +180,12 @@ const Sign: FC<IProps> = (props) => {
     });
   };
 
-  const onCancel = () => publishEvent('canceled:sign');
+  const onCancel = () => {
+    if (onCancelCallback) {
+      return onCancelCallback();
+    }
+    publishEvent('canceled:sign');
+  };
 
   const keys = txAccounts.accounts.flatMap((a) =>
     a.devices.flatMap((d) => d.guard.keys),
